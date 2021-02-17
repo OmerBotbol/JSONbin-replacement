@@ -23,14 +23,16 @@ app.get('/b/:id', (req, res) => {
 })
 
 app.post('/b', (req, res) =>{
-    const body = JSON.stringify(req.body, null, 4)
+    const body = JSON.stringify(req.body, null, 4);
     fs.writeFileSync(`./task/${Date.now()}.json`, body);
     res.send(body);
 
 });
 
-app.put('/b:id', (req, res) => {
-    
+app.put('/b/:id', (req, res) => {
+    const body = JSON.stringify(req.body, null, 4);
+    fs.writeFileSync(`./task/${req.params.id}`, body);
+    res.send('update success');
 })
 
 app.listen(3000, console.log("listening to port 3000"));
