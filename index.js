@@ -4,19 +4,22 @@ const fs= require('fs');
 const {readFileSync} = require('fs');
 
 
-const listOfTasks=[];
-fs.readdirSync('./task').forEach(file => {
-    let task = JSON.parse(readFileSync(`./task/${file}`, {encoding: 'utf8', flag: 'r'}))
-    listOfTasks.push(task)
-});
 app.use(express.json());
 
 app.get('/b', (req, res) =>{
+    const listOfTasks=[];
+    fs.readdirSync('./task').forEach(file => {
+        let task = JSON.parse(readFileSync(`./task/${file}`, {encoding: 'utf8', flag: 'r'}))
+        listOfTasks.push(task)
+    });
     res.send(listOfTasks);
 });
 app.get('/b/:id', (req, res) => {
-    const filteredTask = listOfTasks.filter(task => task.id === req.params.id);
-    res.send(filteredTask);
+    fs.readdirSync('./task').forEach(file => {
+        if(file === req.params.id){
+            res.send(JSON.parse(readFileSync(`./task/${file}`, {encoding: 'utf8', flag: 'r'})))
+        }
+    });
 })
 
 app.post('/b', (req, res) =>{
@@ -25,5 +28,9 @@ app.post('/b', (req, res) =>{
     res.send(body);
 
 });
+
+app.put('/b:id', (req, res) => {
+    
+})
 
 app.listen(3000, console.log("listening to port 3000"));
