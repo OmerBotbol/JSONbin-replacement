@@ -14,10 +14,10 @@ fs.readdirSync('./task').forEach(file => {
 app.get('/b', (req, res) =>{
     res.send(listOfTasks);
 });
-// app.get('/b/:id', (req, res) => {
-//     const filteredTask = data.filter(task => task.id === req.params.id);
-//     res.send(filteredTask);
-// })
+app.get('/b/:id', (req, res) => {
+    const filteredTask = listOfTasks.filter(task => task.id === req.params.id);
+    res.send(filteredTask);
+})
 
 // app.post('/b', (req, res) =>{
 //     req.writeFileSync('./', req.body);
