@@ -35,4 +35,9 @@ app.put('/b/:id', (req, res) => {
     res.send('update success');
 })
 
+app.delete('/b/:id', (req, res) => {
+    fs.unlinkSync(`./task/${req.params.id}`);
+    res.send('the file has deleted');
+})
+
 app.listen(3000, console.log("listening to port 3000"));
