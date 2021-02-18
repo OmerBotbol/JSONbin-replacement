@@ -3,41 +3,91 @@ const app = express();
 const fs= require('fs');
 const {readFileSync} = require('fs');
 
-
+function delay(req, res, next){
+    setTimeout(()=>{return}, 1000);
+    next();
+}
+app.use(delay);
 app.use(express.json());
 
+
 app.get('/b', (req, res) =>{
-    const listOfTasks=[];
-    fs.readdirSync('./task').forEach(file => {
-        let task = JSON.parse(readFileSync(`./task/${file}`, {encoding: 'utf8', flag: 'r'}))
-        listOfTasks.push(task)
-    });
-    res.send(listOfTasks);
+    try{
+        const listOfTasks=[];
+        fs.readdirSync('./task').forEach(file => {
+            let task = JSON.parse(readFileSync(`./task/${file}`, {encoding: 'utf8', flag: 'r'}))
+            listOfTasks.push(task)
+        });
+        res.send(listOfTasks);
+    } catch(e){
+        res.status(404).json({massage: e})
+    }
 });
 app.get('/b/:id', (req, res) => {
-    fs.readdirSync('./task').forEach(file => {
-        if(file === req.params.id){
-            res.send(JSON.parse(readFileSync(`./task/${file}`, {encoding: 'utf8', flag: 'r'})))
-        }
-    });
+    const id = req.params.id;
+    try{
+        const binContent = fs.readFileSync(`./task/${id}.json`, {encoding: 'utf8', flag: 'r'});
+        res.send(JSON.parse(binContent));
+    } catch(e){
+        res.status(404).json({"message": "Invalid Record ID"});
+    }
 })
 
 app.post('/b', (req, res) =>{
-    const body = JSON.stringify(req.body, null, 4);
-    fs.writeFileSync(`./task/${Date.now()}.json`, body);
-    res.send(body);
-
+    try{
+        const id = Date.now();
+        const body = JSON.stringify(req.body, null, 4);
+        fs.writeFileSync(`./task/${id}.json`, body);
+        const successMessage ={
+            success: true,
+            "id": id,
+            "message": "Bin added successfully"
+        }
+        res.send(successMessage);
+    } catch{
+        res.status(404).json({"massage": "Bin not found or it doesn't belong to your account"})
+    }
 });
 
 app.put('/b/:id', (req, res) => {
-    const body = JSON.stringify(req.body, null, 4);
-    fs.writeFileSync(`./task/${req.params.id}`, body);
-    res.send('update success');
+    const body = req.body;
+    const id = req.params.id;
+    const binExist = fs.existsSync(`./task/${id}.json`);
+    if(!binExist) {
+        res.status(404).json({
+            "message": "Bin not found",
+            "success": false
+    });
+    return;
+    }
+    fs.writeFileSync(`./task/${id}.json`, JSON.stringify(body, null, 4));
+    const successMessage = {
+        success: true,
+        data: body,
+        "version": 1,
+        "parentId": id
+    }   
+    res.send(successMessage); 
 })
 
 app.delete('/b/:id', (req, res) => {
-    fs.unlinkSync(`./task/${req.params.id}`);
-    res.send('the file has deleted');
+    const id = req.params.id;
+    const binExist = fs.existsSync(`./task/${id}.json`);
+    if(!binExist) {
+        res.status(401).json({
+            "message": "Bin not found or it doesn't belong to your account",
+            "success": false
+    });
+    return;
+    }
+        fs.unlinkSync(`./task/${id}.json`);
+        const successMessage = {
+            success: true,
+            "version": 1,
+            "parentId": id,
+            "message": "Bin deleted successfully"
+        }   
+        res.send(successMessage);
 })
 
 app.listen(3000, console.log("listening to port 3000"));
