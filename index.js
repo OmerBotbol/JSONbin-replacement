@@ -3,24 +3,22 @@ const app = express();
 const fs= require('fs');
 const {readFileSync} = require('fs');
 
-function delay(req, res, next){
-    setTimeout(()=>{return}, 1000);
-    next();
+function delay(req, res, next) {
+    setTimeout(next, 1000);
 }
 app.use(delay);
 app.use(express.json());
 
-
-app.get('/b', (req, res) =>{
-    try{
+app.get('/b', (req, res) => {
+    try {
         const listOfTasks=[];
         fs.readdirSync('./task').forEach(file => {
             let task = JSON.parse(readFileSync(`./task/${file}`, {encoding: 'utf8', flag: 'r'}))
             listOfTasks.push(task)
         });
         res.send(listOfTasks);
-    } catch(e){
-        res.status(404).json({massage: e})
+    } catch(e) {
+        res.status(404).json({"massage": e})
     }
 });
 app.get('/b/:id', (req, res) => {
@@ -34,17 +32,17 @@ app.get('/b/:id', (req, res) => {
 })
 
 app.post('/b', (req, res) =>{
-    try{
+    try {
         const id = Date.now();
         const body = JSON.stringify(req.body, null, 4);
         fs.writeFileSync(`./task/${id}.json`, body);
-        const successMessage ={
+        const successMessage = {
             success: true,
             "id": id,
             "message": "Bin added successfully"
         }
         res.send(successMessage);
-    } catch{
+    } catch {
         res.status(404).json({"massage": "Bin not found or it doesn't belong to your account"})
     }
 });
@@ -77,17 +75,17 @@ app.delete('/b/:id', (req, res) => {
         res.status(401).json({
             "message": "Bin not found or it doesn't belong to your account",
             "success": false
-    });
-    return;
+        });
+        return;
     }
-        fs.unlinkSync(`./task/${id}.json`);
-        const successMessage = {
-            success: true,
-            "version": 1,
-            "parentId": id,
-            "message": "Bin deleted successfully"
-        }   
-        res.send(successMessage);
+    fs.unlinkSync(`./task/${id}.json`);
+    const successMessage = {
+        success: true,
+        "version": 1,
+        "parentId": id,
+        "message": "Bin deleted successfully"
+    }   
+    res.send(successMessage);
 })
 
 app.listen(3000, console.log("listening to port 3000"));
