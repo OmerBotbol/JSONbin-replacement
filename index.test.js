@@ -77,11 +77,37 @@ describe("PUT entry point:", ()=>{
 
     });
 
-    test("no new bin is created when updating", async()=>{
+    test("if a bin is not found an appropriate response is sent", async()=>{
         const response = await request(app).put("/b/1614098060749").send(taskToPut);
         expect(response.status).toBe(404);
         expect(response.body.success).toBe(expectedPutFailToFind.success);
         expect(response.body.message).toBe(expectedPutFailToFind.message);
 
+    })
+})
+
+describe("DELETE entry point:", ()=>{
+    const expectedDeleteMessage ={
+        success: true,
+        message: "Bin deleted successfully"
+    };
+
+    const expectedDeleteFailMessage={
+        "message": "Bin not found or it doesn't belong to your account",
+        "success": false
+    };
+    
+    it("can delete a bin by id", async()=>{
+        const response = await request(app).delete("/b/1614098060748");
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(expectedDeleteMessage.success);
+        expect(response.body.message).toBe(expectedDeleteMessage.message);
+    })
+
+    test("if a bin is not found an appropriate response is sent", async()=>{
+        const response = await request(app).delete("/b/1614098060749");
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(expectedDeleteFailMessage.success);
+        expect(response.body.message).toBe(expectedDeleteFailMessage.message);
     })
 })
