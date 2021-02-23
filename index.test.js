@@ -1,5 +1,4 @@
-const supertest = require("supertest");
-
+const fs= require('fs');
 const request = require("supertest");
 const app = require("./index");
 
@@ -28,27 +27,27 @@ describe("GET entry point:", ()=>{
     })
 })
 
-// describe("POST entry point:", ()=>{
+describe("POST entry point:", ()=>{
 
-//     const expectedPost ={
-//         success: true,
-//         "message": "Bin added successfully"
-//     };
-//     const taskToPost = {
-//             text: "hello",
-//             date: 1613499160858,
-//             priority: 3,
-//             success: "x"
-//     };
+    const expectedPost ={
+        success: true,
+        "message": "Bin added successfully"
+    };
+    const taskToPost = {
+            text: "hello",
+            date: 1613499160858,
+            priority: 3,
+            success: "x"
+    };
 
-//     it("can add a new bin", async()=>{
-//         const response = await request(app).post("/b").send(taskToPost);
+    it("can add a new bin", async()=>{
+        const response = await request(app).post("/b").send(taskToPost);
 
-//         expect(response.status).toBe(200);
-//         expect(response.body.success).toBe(expectedPost.success);
-//         expect(response.body.message).toEqual(expectedPost.message);
-//     })
-// })
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(expectedPost.success);
+        expect(response.body.message).toEqual(expectedPost.message);
+    })
+})
 
 describe("PUT entry point:", ()=>{
 
@@ -63,6 +62,11 @@ describe("PUT entry point:", ()=>{
         success: true,
         data: taskToPut
     };
+    
+    const expectedPutFailToFind = {
+        "message": "Bin not found",
+        "success": false
+}
 
     it("can update a bin by id",async() =>{
         const response = await request(app).put("/b/1614098060748").send(taskToPut);
@@ -70,6 +74,14 @@ describe("PUT entry point:", ()=>{
         expect(response.body.success).toBe(expectedPut.success);
         expect(response.body.data).toEqual(expectedPut.data);
 
+
+    });
+
+    test("no new bin is created when updating", async()=>{
+        const response = await request(app).put("/b/1614098060749").send(taskToPut);
+        expect(response.status).toBe(404);
+        expect(response.body.success).toBe(expectedPutFailToFind.success);
+        expect(response.body.message).toBe(expectedPutFailToFind.message);
 
     })
 })
