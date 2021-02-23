@@ -6,7 +6,7 @@ const {readFileSync} = require('fs');
 function delay(req, res, next) {
     setTimeout(next, 1000);
 }
-app.use(delay);
+// app.use(delay);
 app.use(express.json());
 
 app.get('/b', (req, res) => {

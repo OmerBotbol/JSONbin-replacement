@@ -3,7 +3,7 @@ const supertest = require("supertest");
 const request = require("supertest");
 const app = require("./index");
 
-describe("GET entry point", ()=>{
+describe("GET entry point:", ()=>{
     const expectedData = {
         text: "omer",
         date: 1613499160858,
@@ -28,18 +28,48 @@ describe("GET entry point", ()=>{
     })
 })
 
-describe("POST entry point", ()=>{
+// describe("POST entry point:", ()=>{
 
-    const expectedPost ={
+//     const expectedPost ={
+//         success: true,
+//         "message": "Bin added successfully"
+//     };
+//     const taskToPost = {
+//             text: "hello",
+//             date: 1613499160858,
+//             priority: 3,
+//             success: "x"
+//     };
+
+//     it("can add a new bin", async()=>{
+//         const response = await request(app).post("/b").send(taskToPost);
+
+//         expect(response.status).toBe(200);
+//         expect(response.body.success).toBe(expectedPost.success);
+//         expect(response.body.message).toEqual(expectedPost.message);
+//     })
+// })
+
+describe("PUT entry point:", ()=>{
+
+    const taskToPut = {
+        text: "clean the room",
+        date: 1613499160858,
+        priority: 5,
+        success: "v"
+    };
+
+    const expectedPut ={
         success: true,
-        "message": "Bin added successfully"
-    }
+        data: taskToPut
+    };
 
-    it("can add a new bin", async()=>{
-        const response = await request(app).post("/b");
-
+    it("can update a bin by id",async() =>{
+        const response = await request(app).put("/b/1614098060748").send(taskToPut);
         expect(response.status).toBe(200);
-        expect(response.body.success).toBe(expectedPost.success)
-        expect(response.body.message).toEqual(expectedPost.message)
+        expect(response.body.success).toBe(expectedPut.success);
+        expect(response.body.data).toEqual(expectedPut.data);
+
+
     })
 })
