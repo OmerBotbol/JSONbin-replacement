@@ -27,3 +27,19 @@ describe("GET entry point", ()=>{
         expect(response.body).toEqual(expectedFailMessage);
     })
 })
+
+describe("POST entry point", ()=>{
+
+    const expectedPost ={
+        success: true,
+        "message": "Bin added successfully"
+    }
+
+    it("can add a new bin", async()=>{
+        const response = await request(app).post("/b");
+
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(expectedPost.success)
+        expect(response.body.message).toEqual(expectedPost.message)
+    })
+})
